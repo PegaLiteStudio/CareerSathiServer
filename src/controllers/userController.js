@@ -271,7 +271,7 @@ const sendReferBonus = (req, res, email, data) => {
                 }
 
                 allUsers[refererEmail]["t"]["e"] += referBonus;
-                allUsers[refererEmail]["t"]["j"] += referBonus;
+                allUsers[refererEmail]["t"]["j"] += 1;
 
                 saveUser(refererPath, allUsers, (err) => {
                     if (!err) {
