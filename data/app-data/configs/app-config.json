@@ -1,0 +1,48 @@
+{
+  "v": 1,
+  "m": false,
+  "sn": "8319149150",
+  "u": "https://play.google.com/store/apps/details?id=com.bmlntech.mycareersaathi.sarthi",
+  "arc": {
+    "rc": "a1XWNAJA5V",
+    "mrc": "CAREERBOSS"
+  },
+  "upi": "pegalitestudio@ybl",
+  "payouts": {
+    "mw": 100,
+    "jp": 999,
+    "rd": 400,
+    "rb": 300
+  },
+  "withdraw-enabled": true,
+  "default-offers": [
+    [
+      "GPay",
+      "201",
+      "Join Using this link o get 201 Rs",
+      "gpay.png",
+      "https://w7.pngwing.com/pngs/191/51/png-transparent-google-pay-or-tez-hd-logo.png"
+    ],
+    [
+      "GPay",
+      "201",
+      "Join Using this link o get 201 Rs",
+      "gpay.png",
+      "https://w7.pngwing.com/pngs/191/51/png-transparent-google-pay-or-tez-hd-logo.png"
+    ],
+    [
+      "GPay",
+      "201",
+      "Join Using this link o get 201 Rs",
+      "gpay.png",
+      "https://w7.pngwing.com/pngs/191/51/png-transparent-google-pay-or-tez-hd-logo.png"
+    ],
+    [
+      "GPay",
+      "201",
+      "Join Using this link o get 201 Rs",
+      "gpay.png",
+      "https://w7.pngwing.com/pngs/191/51/png-transparent-google-pay-or-tez-hd-logo.png"
+    ]
+  ]
+}
