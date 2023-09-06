@@ -96,27 +96,37 @@ const registerUser = (res, email, p, n, pn, i) => {
                                     return throwError(res, err)
                                 }
                                 if (i) {
+                                    console.log("asd")
                                     let refererPath = i[0] + "/" + i[1] + ".json";
                                     readUser(refererPath, (err, refererFileData) => {
                                         if (!err) {
                                             let refererEmail;
+                                            console.log(refererFileData)
                                             for (const key in refererFileData) {
-                                                if (refererFileData[key][1] === i) {
-                                                    refererEmail = key;
+                                                if (refererFileData[key].hasOwnProperty("r")) {
+                                                    if (refererFileData[key]["r"] === i) {
+                                                        refererEmail = key;
+                                                        break
+                                                    }
                                                 }
                                             }
 
+                                            console.log(refererEmail)
+                                            console.log("poo")
                                             if (!refererEmail) {
                                                 throwSuccessWithData(res, {
                                                     token: getJWT(email, p, fileAddress)
                                                 });
                                                 return;
                                             }
+                                            console.log("llf")
 
                                             refererFileData[refererEmail]["t"]["r"] += 1;
 
                                             saveUser(refererPath, refererFileData, (err) => {
                                                 if (!err) {
+                                                    console.log("llo")
+
                                                     throwSuccessWithData(res, {
                                                         token: getJWT(email, p, fileAddress)
                                                     });
@@ -126,6 +136,8 @@ const registerUser = (res, email, p, n, pn, i) => {
                                     }, res)
                                     return;
                                 }
+                                console.log("ddkeo")
+
                                 throwSuccessWithData(res, {
                                     token: getJWT(email, p, fileAddress)
                                 });
