@@ -95,10 +95,40 @@ const registerUser = (res, email, p, n, pn, i) => {
                                 if (err) {
                                     return throwError(res, err)
                                 }
+                                if (i) {
+                                    let refererPath = i[0] + "/" + i[1] + ".json";
+                                    readUser(refererPath, (err, refererFileData) => {
+                                        if (!err) {
+                                            let refererEmail;
+                                            for (const key in refererFileData) {
+                                                if (refererFileData[key][1] === i) {
+                                                    refererEmail = key;
+                                                }
+                                            }
 
+                                            if (!refererEmail) {
+                                                throwSuccessWithData(res, {
+                                                    token: getJWT(email, p, fileAddress)
+                                                });
+                                                return;
+                                            }
+
+                                            refererFileData[refererEmail]["t"]["r"] += 1;
+
+                                            saveUser(refererPath, refererFileData, (err) => {
+                                                if (!err) {
+                                                    throwSuccessWithData(res, {
+                                                        token: getJWT(email, p, fileAddress)
+                                                    });
+                                                }
+                                            }, res);
+                                        }
+                                    }, res)
+                                    return;
+                                }
                                 throwSuccessWithData(res, {
                                     token: getJWT(email, p, fileAddress)
-                                })
+                                });
                             }, res);
                         }
                     }, res);
