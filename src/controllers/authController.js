@@ -9,6 +9,7 @@ const {
     throwSuccessWithData
 } = require("../utils/responseManager");
 const {getIndianTime} = require("../utils/timeManager");
+const {sendNotification} = require("../utils/notificationManager");
 
 const USER_LIMIT_IN_PER_JSON = 5;
 
@@ -117,9 +118,10 @@ const registerUser = (res, email, p, n, pn, i) => {
 
                                             refererFileData[refererEmail]["t"]["r"] += 1;
 
+
                                             saveUser(refererPath, refererFileData, (err) => {
                                                 if (!err) {
-
+                                                    sendNotification(refererEmail, "Great News", `Someone registered with your referral code. Let them know to join the referral program. Keep it going!`)
                                                     throwSuccessWithData(res, {
                                                         token: getJWT(email, p, fileAddress)
                                                     });

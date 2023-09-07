@@ -21,6 +21,7 @@ const {validateReferCode} = require("./authController");
 const {getIndianTime} = require("../utils/timeManager");
 const {insertTransaction, getTransactionHistoryMain} = require("./transactionsController");
 const path = require("path");
+const {sendNotification} = require("../utils/notificationManager");
 
 let ALL_CAREER_OPTIONS, APP_CONFIG, VIDEO_DATA, SLIDER_DATA, PDF_SHORT_CODES;
 
@@ -273,9 +274,11 @@ const sendReferBonus = (req, res, email, data) => {
                 allUsers[refererEmail]["t"]["e"] += referBonus;
                 allUsers[refererEmail]["t"]["j"] += 1;
 
+
                 saveUser(refererPath, allUsers, (err) => {
                     if (!err) {
                         insertTransaction(refererEmail, refererId[1], referBonus, "rb", email, req.data.uda);
+                        sendNotification(refererEmail, "Congratulations", `Exciting news! Someone joined through your referral code, so you've earned ₹${referBonus} RS. Keep sharing for more rewards!`)
                         return throwSuccessWithData(res, data)
                     }
                 }, res);
@@ -614,6 +617,7 @@ const setPayment = (req, res) => {
                                         if (data.length > 3) {
                                             req.userData.i = data[3];
                                         }
+                                        sendNotification(data[0], "Payment Accepted", `Your payment request with reference id ${tid} has been accepted`)
                                         creditFundOrActiveAccount(req, res, amount, tid);
                                     }
                                 }, res);
