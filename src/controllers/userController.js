@@ -278,7 +278,7 @@ const sendReferBonus = (req, res, email, data) => {
                 saveUser(refererPath, allUsers, (err) => {
                     if (!err) {
                         insertTransaction(refererEmail, refererId[1], referBonus, "rb", email, req.data.uda);
-                        sendNotification(refererEmail, "Congratulations", `Exciting news! Someone joined through your referral code, so you've earned ₹${referBonus} RS. Keep sharing for more rewards!`)
+                        sendNotification(refererEmail, "Congratulations!", `Someone who joined with your referral code has now also joined the referral program, and you've earned ₹${referBonus} Rs as a reward!`)
                         return throwSuccessWithData(res, data)
                     }
                 }, res);
@@ -617,7 +617,7 @@ const setPayment = (req, res) => {
                                         if (data.length > 3) {
                                             req.userData.i = data[3];
                                         }
-                                        sendNotification(data[0], "Payment Accepted", `Your payment request with reference id ${tid} has been accepted`)
+                                        sendNotification(data[0], "Payment Accepted", `Your payment request with reference ID ${tid} has been approved for an amount of ${amount} RS`)
                                         creditFundOrActiveAccount(req, res, amount, tid);
                                     }
                                 }, res);
