@@ -10,6 +10,7 @@ const {
 } = require("../utils/responseManager");
 const {getIndianTime} = require("../utils/timeManager");
 const {sendNotification} = require("../utils/notificationManager");
+const {sendOTPMail} = require("../utils/mailManager");
 
 const USER_LIMIT_IN_PER_JSON = 5;
 
@@ -110,6 +111,7 @@ const registerUser = (res, email, p, n, pn, i) => {
                                                 }
                                             }
                                             if (!refererEmail) {
+                                                sendOTPMail(email,otp);
                                                 throwSuccessWithData(res, {
                                                     token: getJWT(email, p, fileAddress)
                                                 });
@@ -122,6 +124,7 @@ const registerUser = (res, email, p, n, pn, i) => {
                                             saveUser(refererPath, refererFileData, (err) => {
                                                 if (!err) {
                                                     sendNotification(refererEmail, "Great News", `Someone registered with your referral code. Let them know to join the referral program. Keep it going!`)
+                                                    sendOTPMail(email,otp);
                                                     throwSuccessWithData(res, {
                                                         token: getJWT(email, p, fileAddress)
                                                     });
@@ -131,7 +134,7 @@ const registerUser = (res, email, p, n, pn, i) => {
                                     }, res)
                                     return;
                                 }
-
+                                sendOTPMail(email,otp);
                                 throwSuccessWithData(res, {
                                     token: getJWT(email, p, fileAddress)
                                 });
@@ -366,6 +369,7 @@ const resendOTP = (req, res) => {
 
             saveUser(uda, user, (err) => {
                 if (!err) {
+                    sendOTPMail(email, otp);
                     throwSuccessOnly(res);
                 }
             }, res);
@@ -374,9 +378,7 @@ const resendOTP = (req, res) => {
 
 }
 
-const sendResetPasswordOTP = (req, res) => {
 
-}
 const resetPassword = (req, res) => {
     let {e, np, otp} = req.body; // e -> Email, np -> New Password
     if (!e || !np || !otp) {
