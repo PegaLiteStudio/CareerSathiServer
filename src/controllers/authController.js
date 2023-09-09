@@ -12,7 +12,7 @@ const {getIndianTime} = require("../utils/timeManager");
 const {sendNotification} = require("../utils/notificationManager");
 const {sendOTPMail} = require("../utils/mailManager");
 
-const USER_LIMIT_IN_PER_JSON = 5;
+const USER_LIMIT_IN_PER_JSON = 50;
 
 const getJWT = (e, p, uda) => {
     let data = {
@@ -111,7 +111,7 @@ const registerUser = (res, email, p, n, pn, i) => {
                                                 }
                                             }
                                             if (!refererEmail) {
-                                                sendOTPMail(email,otp);
+                                                sendOTPMail(email, otp);
                                                 throwSuccessWithData(res, {
                                                     token: getJWT(email, p, fileAddress)
                                                 });
@@ -124,7 +124,7 @@ const registerUser = (res, email, p, n, pn, i) => {
                                             saveUser(refererPath, refererFileData, (err) => {
                                                 if (!err) {
                                                     sendNotification(refererEmail, "Great News", `Someone registered with your referral code. Let them know to join the referral program. Keep it going!`)
-                                                    sendOTPMail(email,otp);
+                                                    sendOTPMail(email, otp);
                                                     throwSuccessWithData(res, {
                                                         token: getJWT(email, p, fileAddress)
                                                     });
@@ -134,7 +134,7 @@ const registerUser = (res, email, p, n, pn, i) => {
                                     }, res)
                                     return;
                                 }
-                                sendOTPMail(email,otp);
+                                sendOTPMail(email, otp);
                                 throwSuccessWithData(res, {
                                     token: getJWT(email, p, fileAddress)
                                 });
@@ -377,6 +377,48 @@ const resendOTP = (req, res) => {
     }, res);
 
 }
+const resendOTPByEmail = (req, res) => {
+    let email = req.body.e;
+
+    readAllUsers(email, (err, allUsersData) => {
+        if (!err) {
+            if (!allUsersData.hasOwnProperty(email)) {
+                return throwMessage(res, "Email Not Registered", "003");
+            }
+
+            let uda = email[0] + "/" + allUsersData[email][0] + ".json"
+            readUser(uda, (err, user) => {
+                if (!err) {
+                    if (!user.hasOwnProperty(email)) {
+                        return throwMessage(res, "User Not Exists", "003");
+                    }
+
+                    if (user[email].hasOwnProperty("otp")) {
+                        delete user[email]["otp"];
+                    }
+
+                    const expirationTime = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+                    let otp = generateRandomID(5, true);
+                    user[email]["otp"] = [otp, expirationTime.toISOString()];
+
+                    console.log("OTP for " + email + " is [" + otp + "]")
+
+                    saveUser(uda, user, (err) => {
+                        if (!err) {
+                            sendOTPMail(email, otp);
+                            throwSuccessOnly(res);
+                        }
+                    }, res);
+                }
+            }, res);
+
+
+        }
+    }, res)
+
+
+}
 
 
 const resetPassword = (req, res) => {
@@ -404,17 +446,28 @@ const resetPassword = (req, res) => {
                         return throwMessage(res, "User Not Exists", "003");
                     }
 
-                    if (!user.e.hasOwnProperty("otp")) {
-                        return throwMessage(res, "Invalid OTP Request", "009");
+                    if (!user[e].hasOwnProperty("otp")) {
+                        return throwMessage(res, "OTP expired", "012");
                     }
 
-                    if (!user.e.otp !== otp) {
-                        return throwMessage(res, "Invalid OTP", "010");
+                    if (user[e]["otp"][0] !== otp) {
+                        return throwMessage(res, "Invalid OTP", "013");
                     }
 
-                    user.e.otp.p = np;
+                    const expirationTime = new Date(user[e]["otp"][1]);
+                    const currentTime = new Date();
 
-                    throwSuccessOnly(res);
+                    if (currentTime > expirationTime) {
+                        return throwMessage(res, "OTP expired", "012");
+                    }
+
+                    user[e]["p"] = np;
+                    delete user[e]["otp"];
+                    saveUser(uda, user, (err) => {
+                        if (!err) {
+                            throwSuccessOnly(res);
+                        }
+                    }, res);
                 }
             }, res);
 
@@ -425,5 +478,14 @@ const resetPassword = (req, res) => {
 }
 
 module.exports = {
-    register, login, getJWT, loginUser, checkEmail, validateOTP, resendOTP, validateReferCode
+    register,
+    login,
+    getJWT,
+    loginUser,
+    checkEmail,
+    validateOTP,
+    resendOTP,
+    resendOTPByEmail,
+    resetPassword,
+    validateReferCode
 }

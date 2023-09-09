@@ -1,7 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const {login, register, checkEmail, validateOTP, resendOTP} = require("../controllers/authController");
+const {
+    login,
+    register,
+    checkEmail,
+    validateOTP,
+    resendOTP,
+    resendOTPByEmail, resetPassword
+} = require("../controllers/authController");
 const {verifyJwt} = require("../middleware/jwtAuth");
 const {
     appStatus,
@@ -19,6 +26,8 @@ router.post("/auth/login", login);
 router.post("/auth/checkEmail", checkEmail);
 router.post("/auth/validateOTP", verifyJwt, validateOTP);
 router.post("/auth/resendOTP", verifyJwt, resendOTP);
+router.post("/auth/resendOTPByEmail", resendOTPByEmail);
+    router.post("/auth/resetPassword", resetPassword);
 
 router.get("/getPdf/:option/:pdf", getPdf);
 router.get("/getImage/:image", getImage);
