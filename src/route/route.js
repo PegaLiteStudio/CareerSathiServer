@@ -20,6 +20,8 @@ const {
     getDefaultOffers, getFriendsOffers, getOwnOffers, setOffer
 } = require("../controllers/userController");
 const {getPdf, getImage} = require("../controllers/contentController");
+const {getAppConfig, updateAppConfig} = require("../controllers/admin/appController");
+const {getWithdrawRequests, completeWithdraw, rejectWithdraw} = require("../controllers/admin/userAdminController");
 
 router.post("/auth/register", register);
 router.post("/auth/login", login);
@@ -27,7 +29,7 @@ router.post("/auth/checkEmail", checkEmail);
 router.post("/auth/validateOTP", verifyJwt, validateOTP);
 router.post("/auth/resendOTP", verifyJwt, resendOTP);
 router.post("/auth/resendOTPByEmail", resendOTPByEmail);
-    router.post("/auth/resetPassword", resetPassword);
+router.post("/auth/resetPassword", resetPassword);
 
 router.get("/getPdf/:option/:pdf", getPdf);
 router.get("/getImage/:image", getImage);
@@ -50,6 +52,11 @@ router.post("/setOffer", verifyJwt, setOffer);
 
 // Admin
 router.post("/setPayment/:tid/:amount", setPayment);
+router.post("/admin/getAppConfig", getAppConfig);
+router.post("/admin/updateAppConfig", updateAppConfig);
+router.post("/admin/getWithdrawRequests", getWithdrawRequests);
+router.post("/admin/completeWithdraw", completeWithdraw);
+router.post("/admin/rejectWithdraw", rejectWithdraw);
 
 module.exports = router
 

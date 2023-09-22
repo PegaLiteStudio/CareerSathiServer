@@ -46,6 +46,17 @@ const readFile = (path, callBack, res) => {
 
 }
 
+const readFileSync = (path, callBack, res) => {
+    try {
+        let data = fs.readFileSync(path, "utf8");
+        callBack(undefined, JSON.parse(data))
+    } catch (e) {
+        callBack(e);
+        if (res) throwError(res, e);
+    }
+
+}
+
 const saveUser = (uda, data, callBack, res) => {
     fs.writeFile(userPath + uda, JSON.stringify(data), err => {
         if (err) {
@@ -142,6 +153,7 @@ module.exports = {
     appImagesPath,
     pdfShortCodesPath,
     readFile,
+    readFileSync,
     saveFile,
     readUser,
     readUserAsync,

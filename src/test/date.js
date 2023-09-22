@@ -28,7 +28,7 @@ const otpFilePath = path.join(__dirname, 'otp_data.json');
 
 console.log(new Date().toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}))
 const now = new Date();
-const options = { timeZone: 'Asia/Kolkata', day: '2-digit', month: '2-digit', year: '2-digit' };
+const options = {timeZone: 'Asia/Kolkata', day: '2-digit', month: '2-digit', year: '2-digit'};
 const formattedDate = now.toLocaleDateString('en-US', options);
 
 

@@ -11,7 +11,10 @@ const {
     saveUser,
     allDepositsPath,
     allPaymentsPath,
-    allCompletedPaymentsPath, allWithdrawPath, generateRandomID, allOffersPath
+    allCompletedPaymentsPath,
+    allWithdrawPath,
+    generateRandomID,
+    allOffersPath
 } = require("../utils/fileManager");
 const {
     throwError, throwSuccessWithData, throwMessage, throwSuccessOnly, throwMessageDeclared, MISSING_PARAMETERS_MSG
@@ -108,7 +111,10 @@ const appStatus = (req, res) => {
                         e: req.data.e, n: req.userData.n, i: req.userData.i, v: req.userData.v, r: req.userData.r
                     },
                     "app-info": {
-                        sn: APP_CONFIG["sn"], arc: APP_CONFIG["arc"], rb: APP_CONFIG["payouts"]["rb"],
+                        sn: APP_CONFIG["sn"],
+                        arc: APP_CONFIG["arc"],
+                        rb: APP_CONFIG["payouts"]["rb"],
+                        aof: APP_CONFIG["add-own-offers-enabled"]
                     }
                 });
             });
@@ -317,7 +323,7 @@ const getReferProgramDetails = (req, res) => {
                         user.b -= f;
                         user.v = true;
 
-                        insertTransaction(email, req.data.uda, f, "j");
+                        insertTransaction(email, req.data.uda, f, "j", undefined, undefined);
                         saveUser(uda, allUser, (err) => {
                             if (!err) {
 
@@ -452,14 +458,14 @@ const creditFundOrActiveAccount = (req, res, amount, tid) => {
                 } else {
                     user.b += amount;
                 }
-                insertTransaction(email, req.data.uda, amount, "c", tid);
+                insertTransaction(email, req.data.uda, amount, "c", tid, undefined);
                 let data;
                 let isFinal = true;
                 if (!user.hasOwnProperty("v") || user.v === false) {
                     if (user.b === f) {
                         user["v"] = true;
                         user.b = 0;
-                        insertTransaction(email, req.data.uda, f, "j", tid);
+                        insertTransaction(email, req.data.uda, f, "j", tid, undefined);
 
                     } else if (user.b > f) {
                         user["v"] = true;
@@ -467,7 +473,7 @@ const creditFundOrActiveAccount = (req, res, amount, tid) => {
                         data = {
                             "s": "success", amount, f, e: user.b
                         }
-                        insertTransaction(email, req.data.uda, f, "j", tid);
+                        insertTransaction(email, req.data.uda, f, "j", tid, undefined);
                     } else {
                         isFinal = false;
                         let r = f - user.b;
@@ -545,7 +551,7 @@ const saveTransactionId = (req, res) => {
                             if (req.userData.hasOwnProperty("i")) {
                                 depositsData[tid].push(req.userData.i);
                             }
-                            insertTransaction(email, req.data.uda, undefined, "s", tid);
+                            insertTransaction(email, req.data.uda, undefined, "s", tid, undefined);
 
                             saveFile(depositsPath, depositsData, (err) => {
                                 if (!err) {
@@ -693,17 +699,14 @@ const withdrawUsingUpi = (req, res) => {
 
                         function task(data) {
                             if (!data.hasOwnProperty(email)) {
-                                data[email] = [];
+                                data[email] = {};
                             }
 
                             let txnID = generateRandomID();
-                            data[email].push({
-                                txnID,
-                                amount,
-                                upi,
-                                time: getIndianTime()
-                            });
-                            insertTransaction(email, req.data.uda, amount, "w", upi);
+                            data[email][txnID] = {
+                                amount, upi, time: getIndianTime()
+                            };
+                            insertTransaction(email, req.data.uda, amount, "w", upi, undefined, txnID);
                             saveFile(path, data, (err) => {
                                 if (!err) {
                                     throwSuccessOnly(res);
@@ -827,6 +830,7 @@ module.exports = {
     getDefaultOffers,
     getFriendsOffers,
     getOwnOffers,
-    setOffer
+    setOffer,
+    loadData
 
 }
